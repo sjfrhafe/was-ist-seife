@@ -17,6 +17,7 @@ def test_crud():
         "name": "Testcafé", "adresse": "Teststr. 1", "lat": "51,23", "lng": "6.79",
         "sauberkeit": "4", "sterne": "5", "seife": "Sensor",
         "beschilderung_sichtbar": "1", "bewertungszeitpunkt": "2026-07-31T12:30",
+        "toilettenrollenhalter": "Geschlossen",
     }, follow_redirects=True)
     seite = antwort.get_data(as_text=True)
     assert "Testcafé" in seite and "★★★★★" in seite and "51.23" in seite

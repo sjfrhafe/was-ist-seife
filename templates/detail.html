@@ -24,14 +24,13 @@
   <dt>Schwere Tür</dt><dd>{{ janein(eintrag['schwere_tuer']) }}</dd>
 
   {% if eintrag['sauberkeit'] is not none %}<dt>Sauberkeit</dt><dd>{{ eintrag['sauberkeit'] }} / 5</dd>{% endif %}
-  <dt>Papier geschützt</dt><dd>{{ janein(eintrag['papier_geschuetzt']) }}</dd>
+  {% if eintrag['toilettenrollenhalter'] %}<dt>Toilettenrollenhalter</dt><dd>{{ eintrag['toilettenrollenhalter'] }}</dd>{% endif %}
   {% if eintrag['spuelmechanismus'] %}<dt>Spülmechanismus</dt><dd>{{ eintrag['spuelmechanismus'] }}</dd>{% endif %}
   {% if eintrag['seife'] %}<dt>Seife</dt><dd>{{ eintrag['seife'] }}{% if eintrag['seife_kommentar'] %} – {{ eintrag['seife_kommentar'] }}{% endif %}</dd>{% endif %}
   {% if eintrag['wasserhahn'] %}<dt>Wasserhahn</dt><dd>{{ eintrag['wasserhahn'] }}{% if eintrag['wasserhahn_kommentar'] %} – {{ eintrag['wasserhahn_kommentar'] }}{% endif %}</dd>{% endif %}
   {% if eintrag['handtrocknung'] %}<dt>Handtrocknung</dt><dd>{{ eintrag['handtrocknung'] }}{% if eintrag['handtrocknung_kommentar'] %} – {{ eintrag['handtrocknung_kommentar'] }}{% endif %}</dd>{% endif %}
   {% if eintrag['muelleimer'] %}<dt>Mülleimer</dt><dd>{{ eintrag['muelleimer'] }}</dd>{% endif %}
-  {% if eintrag['ausgang'] %}<dt>Ausgang</dt><dd>{{ eintrag['ausgang'] }}
-    {% if eintrag['ausgang'] == 'Tür' %} – ohne Klinke öffenbar: {{ janein(eintrag['ausgang_kontaktlos']) }}{% endif %}</dd>{% endif %}
+  {% if eintrag['ausgang'] %}<dt>Ausgang</dt><dd>{{ eintrag['ausgang'] }}</dd>{% endif %}
 
   {% if eintrag['notizen'] %}<dt>Notizen</dt><dd>{{ eintrag['notizen'] }}</dd>{% endif %}
   {% if eintrag['bewertungszeitpunkt'] %}<dt>Bewertungszeitpunkt</dt><dd>{{ eintrag['bewertungszeitpunkt'] | replace('T', ' ') }}</dd>{% endif %}

@@ -20,10 +20,10 @@ TEXT_FELDER = [
     "wasserhahn", "wasserhahn_kommentar",
     "handtrocknung", "handtrocknung_kommentar",
     "muelleimer", "ausgang", "notizen", "bewertungszeitpunkt",
+    "toilettenrollenhalter",
 ]
 BOOL_FELDER = [
-    "beschilderung_sichtbar", "gender_verstaendlich",
-    "schwere_tuer", "papier_geschuetzt", "ausgang_kontaktlos",
+    "beschilderung_sichtbar", "gender_verstaendlich", "schwere_tuer",
 ]
 ZAHL_FELDER = ["sauberkeit", "sterne"]
 KOORD_FELDER = ["lat", "lng"]
@@ -36,7 +36,9 @@ OPTIONEN = {
     "handtrocknung": ["Offener Föhn", "Geschlossener Föhn", "Papiertuch",
                       "Festes Handtuch", "Trommelhandtuch", "Nichts"],
     "muelleimer": ["Keiner", "Mit Berührung", "Berührungslos"],
-    "ausgang": ["Tür", "Automatiktür", "Offen", "Offen mit Sichtschutz"],
+    "toilettenrollenhalter": ["Offen", "Geschlossen", "Beides"],
+    "ausgang": ["Tür", "Tür (mit Fuß öffenbar)", "Tür (mit Papiertuch öffenbar)",
+                "Automatiktür", "Offen", "Offen mit Sichtschutz"],
 }
 
 SCHEMA = """
@@ -46,13 +48,13 @@ CREATE TABLE IF NOT EXISTS bewertungen (
     adresse TEXT, lat REAL, lng REAL, wegbeschreibung TEXT,
     beschilderung_sichtbar INTEGER, gender_verstaendlich INTEGER,
     erreichbarkeit TEXT, schwere_tuer INTEGER,
-    sauberkeit INTEGER, papier_geschuetzt INTEGER,
+    sauberkeit INTEGER, toilettenrollenhalter TEXT,
     spuelmechanismus TEXT,
     seife TEXT, seife_kommentar TEXT,
     wasserhahn TEXT, wasserhahn_kommentar TEXT,
     handtrocknung TEXT, handtrocknung_kommentar TEXT,
     muelleimer TEXT,
-    ausgang TEXT, ausgang_kontaktlos INTEGER,
+    ausgang TEXT,
     sterne INTEGER, notizen TEXT,
     bewertungszeitpunkt TEXT,
     erstellt_am TEXT DEFAULT (datetime('now', 'localtime')),
@@ -69,6 +71,17 @@ with sqlite3.connect(DB_PATH) as conn:
         conn.execute("ALTER TABLE bewertungen ADD COLUMN bewertungszeitpunkt TEXT")
     except sqlite3.OperationalError:
         pass  # Spalte existiert schon
+    try:
+        conn.execute("ALTER TABLE bewertungen ADD COLUMN toilettenrollenhalter TEXT")
+        conn.execute("UPDATE bewertungen SET toilettenrollenhalter = 'Geschlossen' "
+                     "WHERE papier_geschuetzt = 1")
+    except sqlite3.OperationalError:
+        pass  # schon migriert
+    for alte_spalte in ["papier_geschuetzt", "ausgang_kontaktlos"]:
+        try:
+            conn.execute(f"ALTER TABLE bewertungen DROP COLUMN {alte_spalte}")
+        except sqlite3.OperationalError:
+            pass  # schon weg (oder frische DB)
 
 
 def db():

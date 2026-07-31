@@ -21,7 +21,15 @@
 <hr width="80%">
 
 {% if eintraege %}
+<table border="2" cellpadding="4" bgcolor="#C0C0C0" bordercolor="#00FFFF"><tr><td>
+  <font face="Comic Sans MS, cursive" color="#000080"><b>&#128269; Suche:</b></font>
+  <input type="text" size="30" oninput="suchen(this)">
+</td></tr></table>
+<font id="keine-treffer" size="4" color="#FF0000" style="display:none"><br>Leider nix gefunden :-(</font>
+<br>
+
 {% for e in eintraege %}
+<div class="eintrag">
 <table width="600" border="3" cellpadding="6" cellspacing="0" bgcolor="#C0C0C0" bordercolor="#FF00FF">
   <tr bgcolor="#008080">
     <td colspan="2" align="center">
@@ -50,17 +58,32 @@
   {{ zeile('Erreichbarkeit', e['erreichbarkeit']) }}
   {{ zeile('Schwere Tür', 'Ja, uff!' if e['schwere_tuer'] else 'Nein') }}
   {{ zeile('Sauberkeit', (e['sauberkeit'] ~ ' von 5') if e['sauberkeit'] is not none else '') }}
-  {{ zeile('Klopapier aerosolgeschützt', 'Ja' if e['papier_geschuetzt'] else 'Nein') }}
+  {{ zeile('Toilettenrollenhalter', e['toilettenrollenhalter']) }}
   {{ zeile('Spülmechanismus', e['spuelmechanismus']) }}
   {{ zeile('Seife', e['seife'] ~ (' — ' ~ e['seife_kommentar'] if e['seife_kommentar'] else '') if e['seife'] else '') }}
   {{ zeile('Wasserhahn', e['wasserhahn'] ~ (' — ' ~ e['wasserhahn_kommentar'] if e['wasserhahn_kommentar'] else '') if e['wasserhahn'] else '') }}
   {{ zeile('Handtrocknung', e['handtrocknung'] ~ (' — ' ~ e['handtrocknung_kommentar'] if e['handtrocknung_kommentar'] else '') if e['handtrocknung'] else '') }}
   {{ zeile('Mülleimer', e['muelleimer']) }}
-  {{ zeile('Ausgang', e['ausgang'] ~ (' (ohne Klinke öffenbar: ' ~ ('Ja' if e['ausgang_kontaktlos'] else 'Nein') ~ ')' if e['ausgang'] == 'Tür' else '') if e['ausgang'] else '') }}
+  {{ zeile('Ausgang', e['ausgang']) }}
   {{ zeile('Notizen', e['notizen']) }}
 </table>
 <font size="4" color="#00FFFF">.oO°Oo.·´¯`·.oO°Oo.·´¯`·.oO°Oo.</font><br><br>
+</div>
 {% endfor %}
+
+<script>
+function suchen(feld) {
+  var begriff = feld.value.toLowerCase();
+  var eintraege = document.getElementsByClassName("eintrag");
+  var treffer = 0;
+  for (var i = 0; i < eintraege.length; i++) {
+    var passt = eintraege[i].textContent.toLowerCase().indexOf(begriff) >= 0;
+    eintraege[i].style.display = passt ? "" : "none";
+    if (passt) treffer++;
+  }
+  document.getElementById("keine-treffer").style.display = treffer ? "none" : "";
+}
+</script>
 {% else %}
 <font face="Comic Sans MS, cursive" size="4">Hier entsteht in K&uuml;rze eine gro&szlig;e Toiletten-Testseite. Schau bald wieder vorbei!</font><br>
 <font size="6">&#128679; UNDER CONSTRUCTION &#128679;</font>
@@ -69,10 +92,8 @@
 <hr width="80%">
 
 <font face="Times New Roman, serif" size="2">
-Zuletzt aktualisiert: {{ stand }} &nbsp;|&nbsp; Du bist Besucher Nr. <b>0000042</b><br>
-Diese Seite ist Teil des Toiletten-Webrings: [ <a href="#"><u>zur&uuml;ck</u></a> | <a href="#"><u>Zufall</u></a> | <a href="#"><u>weiter</u></a> ]<br>
-Am besten anzusehen in 800&times;600 mit Netscape Navigator 4.7 &nbsp;|&nbsp; Diese Seite ist Y2K-gepr&uuml;ft!<br>
-<span class="blink">&copy; {{ stand[6:10] }} Fred &mdash; Alle Rechte vorbehalten!!</span>
+Zuletzt aktualisiert: {{ stand }}<br>
+Am besten anzusehen in 800&times;600 mit Netscape Navigator 4.7 &nbsp;|&nbsp; Diese Seite ist Y2K-gepr&uuml;ft!
 </font>
 </center>
 

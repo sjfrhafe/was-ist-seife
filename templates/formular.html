@@ -61,7 +61,7 @@
   <fieldset>
     <legend>Hygiene</legend>
     {{ skala('sauberkeit', 'Subjektive Sauberkeit (1–5)', 1, 5) }}
-    {{ kastchen('papier_geschuetzt', 'Toilettenpapier gegen Aerosole geschützt') }}
+    {{ auswahl('toilettenrollenhalter', 'Toilettenrollenhalter') }}
     <label for="spuelmechanismus">Spülmechanismus</label>
     <input type="text" id="spuelmechanismus" name="spuelmechanismus"
       value="{{ eintrag.get('spuelmechanismus') or '' }}">
@@ -80,7 +80,6 @@
       value="{{ eintrag.get('handtrocknung_kommentar') or '' }}">
     {{ auswahl('muelleimer', 'Mülleimer') }}
     {{ auswahl('ausgang', 'Ausgang') }}
-    {{ kastchen('ausgang_kontaktlos', 'Tür ohne Klinken-Berührung öffenbar (z. B. Papiertuch, Fuß)') }}
   </fieldset>
 
   <fieldset>
