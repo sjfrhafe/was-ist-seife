@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Was ist Seife?</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 40rem; margin: 0 auto;
+         padding: 0 1rem 3rem; line-height: 1.5; color: #222; }
+  header { display: flex; justify-content: space-between; align-items: baseline;
+           padding: 1rem 0; border-bottom: 2px solid #0a7; margin-bottom: 1rem; }
+  header a { text-decoration: none; color: inherit; }
+  h1 { font-size: 1.4rem; margin: 0; }
+  a.knopf, button { display: inline-block; background: #0a7; color: #fff; border: none;
+           border-radius: 6px; padding: .6rem 1rem; font-size: 1rem;
+           text-decoration: none; cursor: pointer; }
+  button.gefahr { background: #c33; }
+  button.neutral { background: #667; }
+  label { display: block; margin-top: .8rem; font-weight: 600; }
+  input[type=text], input[type=number], select, textarea {
+    width: 100%; padding: .5rem; font-size: 1rem; border: 1px solid #bbb;
+    border-radius: 6px; box-sizing: border-box; }
+  fieldset { border: 1px solid #ccc; border-radius: 8px; margin-top: 1.2rem; }
+  legend { font-weight: 700; padding: 0 .4rem; }
+  .kastchen { font-weight: 400; display: flex; align-items: center; gap: .5rem; }
+  .kastchen input { width: 1.2rem; height: 1.2rem; }
+  .sterne-wahl label { display: inline; font-weight: 400; margin-right: .8rem; }
+  .fehler { background: #fdd; border: 1px solid #c33; padding: .5rem; border-radius: 6px; }
+  ul.eintraege { list-style: none; padding: 0; }
+  ul.eintraege li { border: 1px solid #ccc; border-radius: 8px; padding: .8rem; margin-bottom: .6rem; }
+  ul.eintraege a { text-decoration: none; color: inherit; display: block; }
+  .sterne { color: #e90; }
+  .gedimmt { color: #777; font-size: .9rem; }
+  dl { display: grid; grid-template-columns: max-content 1fr; gap: .3rem 1rem; }
+  dt { font-weight: 600; }
+  dd { margin: 0; }
+</style>
+</head>
+<body>
+<header>
+  <h1><a href="{{ url_for('liste') }}">🧼 Was ist Seife?</a></h1>
+  <a class="knopf" href="{{ url_for('neu') }}">+ Neue Bewertung</a>
+</header>
+{% block inhalt %}{% endblock %}
+</body>
+</html>

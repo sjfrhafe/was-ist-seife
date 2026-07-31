@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% macro janein(wert) %}{{ 'Ja' if wert else 'Nein' }}{% endmacro %}
+
+{% block inhalt %}
+<h2>{{ eintrag['name'] }}
+  {% if eintrag['sterne'] is not none %}
+  <span class="sterne">{{ '★' * eintrag['sterne'] }}{{ '☆' * (5 - eintrag['sterne']) }}</span>
+  {% endif %}
+</h2>
+
+<dl>
+  {% if eintrag['adresse'] %}<dt>Adresse</dt><dd>{{ eintrag['adresse'] }}</dd>{% endif %}
+  {% if eintrag['lat'] is not none and eintrag['lng'] is not none %}
+  <dt>Karte</dt>
+  <dd><a href="https://www.openstreetmap.org/?mlat={{ eintrag['lat'] }}&mlon={{ eintrag['lng'] }}#map=18/{{ eintrag['lat'] }}/{{ eintrag['lng'] }}">
+    {{ eintrag['lat'] }}, {{ eintrag['lng'] }} (OpenStreetMap)</a></dd>
+  {% endif %}
+  {% if eintrag['wegbeschreibung'] %}<dt>Wegbeschreibung</dt><dd>{{ eintrag['wegbeschreibung'] }}</dd>{% endif %}
+
+  <dt>Beschilderung sichtbar</dt><dd>{{ janein(eintrag['beschilderung_sichtbar']) }}</dd>
+  <dt>Gender-Kennzeichnung verständlich</dt><dd>{{ janein(eintrag['gender_verstaendlich']) }}</dd>
+  {% if eintrag['erreichbarkeit'] %}<dt>Erreichbarkeit</dt><dd>{{ eintrag['erreichbarkeit'] }}</dd>{% endif %}
+  <dt>Schwere Tür</dt><dd>{{ janein(eintrag['schwere_tuer']) }}</dd>
+
+  {% if eintrag['sauberkeit'] is not none %}<dt>Sauberkeit</dt><dd>{{ eintrag['sauberkeit'] }} / 5</dd>{% endif %}
+  <dt>Papier geschützt</dt><dd>{{ janein(eintrag['papier_geschuetzt']) }}</dd>
+  {% if eintrag['spuelmechanismus'] %}<dt>Spülmechanismus</dt><dd>{{ eintrag['spuelmechanismus'] }}</dd>{% endif %}
+  {% if eintrag['seife'] %}<dt>Seife</dt><dd>{{ eintrag['seife'] }}{% if eintrag['seife_kommentar'] %} – {{ eintrag['seife_kommentar'] }}{% endif %}</dd>{% endif %}
+  {% if eintrag['wasserhahn'] %}<dt>Wasserhahn</dt><dd>{{ eintrag['wasserhahn'] }}{% if eintrag['wasserhahn_kommentar'] %} – {{ eintrag['wasserhahn_kommentar'] }}{% endif %}</dd>{% endif %}
+  {% if eintrag['handtrocknung'] %}<dt>Handtrocknung</dt><dd>{{ eintrag['handtrocknung'] }}{% if eintrag['handtrocknung_kommentar'] %} – {{ eintrag['handtrocknung_kommentar'] }}{% endif %}</dd>{% endif %}
+  {% if eintrag['muelleimer'] %}<dt>Mülleimer</dt><dd>{{ eintrag['muelleimer'] }}</dd>{% endif %}
+  {% if eintrag['ausgang'] %}<dt>Ausgang</dt><dd>{{ eintrag['ausgang'] }}
+    {% if eintrag['ausgang'] == 'Tür' %} – ohne Klinke öffenbar: {{ janein(eintrag['ausgang_kontaktlos']) }}{% endif %}</dd>{% endif %}
+
+  {% if eintrag['notizen'] %}<dt>Notizen</dt><dd>{{ eintrag['notizen'] }}</dd>{% endif %}
+  {% if eintrag['bewertungszeitpunkt'] %}<dt>Bewertungszeitpunkt</dt><dd>{{ eintrag['bewertungszeitpunkt'] | replace('T', ' ') }}</dd>{% endif %}
+  <dt>Erstellt</dt><dd>{{ eintrag['erstellt_am'] }}</dd>
+  <dt>Geändert</dt><dd>{{ eintrag['geaendert_am'] }}</dd>
+</dl>
+
+<div style="margin-top:1rem; display:flex; gap:.6rem">
+  <a class="knopf" href="{{ url_for('bearbeiten', eintrag_id=eintrag['id']) }}">Bearbeiten</a>
+  <form method="post" action="{{ url_for('loeschen', eintrag_id=eintrag['id']) }}"
+        onsubmit="return confirm('Wirklich löschen?')">
+    <button type="submit" class="gefahr">Löschen</button>
+  </form>
+</div>
+{% endblock %}

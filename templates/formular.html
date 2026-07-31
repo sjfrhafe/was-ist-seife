@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% macro auswahl(feld, titel) %}
+<label for="{{ feld }}">{{ titel }}</label>
+<select id="{{ feld }}" name="{{ feld }}">
+  <option value="">– unbekannt –</option>
+  {% for o in optionen[feld] %}
+  <option value="{{ o }}" {{ 'selected' if eintrag.get(feld) == o }}>{{ o }}</option>
+  {% endfor %}
+</select>
+{% endmacro %}
+
+{% macro kastchen(feld, titel) %}
+<label class="kastchen">
+  <input type="checkbox" name="{{ feld }}" value="1" {{ 'checked' if eintrag.get(feld) }}>
+  {{ titel }}
+</label>
+{% endmacro %}
+
+{% macro skala(feld, titel, von, bis) %}
+<label>{{ titel }}</label>
+<div class="sterne-wahl">
+  {% for i in range(von, bis + 1) %}
+  <label><input type="radio" name="{{ feld }}" value="{{ i }}"
+    {{ 'checked' if eintrag.get(feld) == i }}> {{ i }}</label>
+  {% endfor %}
+</div>
+{% endmacro %}
+
+{% block inhalt %}
+{% if fehler %}<p class="fehler">{{ fehler }}</p>{% endif %}
+<form method="post">
+  <fieldset>
+    <legend>Ort</legend>
+    <label for="name">Name *</label>
+    <input type="text" id="name" name="name" required value="{{ eintrag.get('name') or '' }}">
+    <label for="bewertungszeitpunkt">Bewertungszeitpunkt</label>
+    <input type="datetime-local" id="bewertungszeitpunkt" name="bewertungszeitpunkt"
+      value="{{ eintrag.get('bewertungszeitpunkt') or '' }}">
+    <label for="adresse">Adresse</label>
+    <input type="text" id="adresse" name="adresse" value="{{ eintrag.get('adresse') or '' }}">
+    <label>Koordinaten</label>
+    <button type="button" class="neutral" onclick="standortHolen(this)">📍 Standort übernehmen</button>
+    <label for="lat">Breitengrad (Lat)</label>
+    <input type="text" id="lat" name="lat" inputmode="decimal" value="{{ eintrag.get('lat') if eintrag.get('lat') is not none else '' }}">
+    <label for="lng">Längengrad (Lng)</label>
+    <input type="text" id="lng" name="lng" inputmode="decimal" value="{{ eintrag.get('lng') if eintrag.get('lng') is not none else '' }}">
+    <label for="wegbeschreibung">Wegbeschreibung</label>
+    <textarea id="wegbeschreibung" name="wegbeschreibung" rows="2"
+      placeholder="z. B. hinten links, Treppe runter">{{ eintrag.get('wegbeschreibung') or '' }}</textarea>
+  </fieldset>
+
+  <fieldset>
+    <legend>Findbarkeit &amp; Erreichbarkeit</legend>
+    {{ kastchen('beschilderung_sichtbar', 'Beschilderung sichtbar') }}
+    {{ kastchen('gender_verstaendlich', 'Gender-Kennzeichnung verständlich') }}
+    {{ auswahl('erreichbarkeit', 'Erreichbarkeit') }}
+    {{ kastchen('schwere_tuer', 'Schwere Tür') }}
+  </fieldset>
+
+  <fieldset>
+    <legend>Hygiene</legend>
+    {{ skala('sauberkeit', 'Subjektive Sauberkeit (1–5)', 1, 5) }}
+    {{ kastchen('papier_geschuetzt', 'Toilettenpapier gegen Aerosole geschützt') }}
+    <label for="spuelmechanismus">Spülmechanismus</label>
+    <input type="text" id="spuelmechanismus" name="spuelmechanismus"
+      value="{{ eintrag.get('spuelmechanismus') or '' }}">
+    {{ auswahl('seife', 'Seife (Auslösungsmechanismus)') }}
+    <label for="seife_kommentar">Kommentar zur Seife</label>
+    <input type="text" id="seife_kommentar" name="seife_kommentar"
+      value="{{ eintrag.get('seife_kommentar') or '' }}">
+    {{ auswahl('wasserhahn', 'Wasserhahn (Auslösungsmechanismus)') }}
+    <label for="wasserhahn_kommentar">Kommentar zum Wasserhahn</label>
+    <input type="text" id="wasserhahn_kommentar" name="wasserhahn_kommentar"
+      placeholder="z. B. Druckknopf-Zeit zu kurz"
+      value="{{ eintrag.get('wasserhahn_kommentar') or '' }}">
+    {{ auswahl('handtrocknung', 'Handtrocknung') }}
+    <label for="handtrocknung_kommentar">Kommentar zur Handtrocknung</label>
+    <input type="text" id="handtrocknung_kommentar" name="handtrocknung_kommentar"
+      value="{{ eintrag.get('handtrocknung_kommentar') or '' }}">
+    {{ auswahl('muelleimer', 'Mülleimer') }}
+    {{ auswahl('ausgang', 'Ausgang') }}
+    {{ kastchen('ausgang_kontaktlos', 'Tür ohne Klinken-Berührung öffenbar (z. B. Papiertuch, Fuß)') }}
+  </fieldset>
+
+  <fieldset>
+    <legend>Fazit</legend>
+    {{ skala('sterne', 'Gesamtbewertung (0–5 Sterne)', 0, 5) }}
+    <label for="notizen">Weitere Notizen</label>
+    <textarea id="notizen" name="notizen" rows="4">{{ eintrag.get('notizen') or '' }}</textarea>
+  </fieldset>
+
+  <p><button type="submit">Speichern</button></p>
+</form>
+
+<script>
+function standortHolen(knopf) {
+  if (!navigator.geolocation) {
+    knopf.textContent = "Geolocation nicht verfügbar (HTTPS nötig?) – bitte manuell eintragen";
+    return;
+  }
+  knopf.textContent = "📍 Suche Standort …";
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      document.getElementById("lat").value = pos.coords.latitude.toFixed(6);
+      document.getElementById("lng").value = pos.coords.longitude.toFixed(6);
+      knopf.textContent = "📍 Standort übernommen";
+    },
+    err => { knopf.textContent = "Fehlgeschlagen (" + err.message + ") – bitte manuell eintragen"; },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
+}
+</script>
+{% endblock %}

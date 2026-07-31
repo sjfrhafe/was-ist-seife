@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block inhalt %}
+{% if eintraege %}
+<ul class="eintraege">
+  {% for e in eintraege %}
+  <li>
+    <a href="{{ url_for('detail', eintrag_id=e['id']) }}">
+      <strong>{{ e['name'] }}</strong>
+      {% if e['sterne'] is not none %}
+        <span class="sterne">{{ '★' * e['sterne'] }}{{ '☆' * (5 - e['sterne']) }}</span>
+      {% endif %}
+      <div class="gedimmt">{{ e['adresse'] or '' }} · {{ e['zeitpunkt'] | replace('T', ' ') }}</div>
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>Noch keine Bewertungen. Leg mit „+ Neue Bewertung“ los.</p>
+{% endif %}
+{% endblock %}
