@@ -1,42 +1,22 @@
 # Was ist Seife? 🧼
 
-Selbstgehostete Webapp zum Bewerten der Toilettenhygiene von Restaurants & Co.
-Flask + SQLite, läuft per Docker im Heimnetz.
+Not the SOAP API you wanted, but the soap API you need.
 
-## Starten
+Selbstgehostete Webapp zum Bewerten der Toilettenhygiene von Restaurants & Co.
+Flask + SQLite, Docker, Heimnetz. DB liegt in `./data/seife.db`.
 
 ```sh
-docker compose up --build -d
-# → http://localhost:8000
+docker compose up --build -d   # → http://localhost:8000
+python test_app.py             # Tests
 ```
-
-Die Datenbank liegt in `./data/seife.db`.
 
 ## Veröffentlichen auf github.io
 
-Der Button „🌐 Veröffentlichen" rendert alle Bewertungen als Retro-HTML-Seite
-und committet sie per GitHub-API nach `docs/index.html` in dieses Repo.
-Einmalige Einrichtung:
+„🌐 Veröffentlichen" committet alle Bewertungen als Retro-HTML-Seite per
+GitHub-API nach `docs/index.html` (Vorschau: `/export`). Einmalig:
 
-1. Repo auf GitHub anlegen (public) und dieses Repo dorthin pushen
-2. GitHub → Settings → Pages → Source: Branch `main`, Ordner `/docs`
-3. Fine-grained Token erzeugen (Settings → Developer settings → Tokens),
-   nur für dieses Repo, Berechtigung **Contents: Read and write**
-4. `.env` neben `compose.yml` anlegen (ist gitignored):
-
-   ```
-   GITHUB_TOKEN=github_pat_…
-   GITHUB_REPO=<user>/was-ist-seife
-   ```
-
-5. `docker compose up -d` neu starten
-
-Vorschau der Export-Seite ohne Veröffentlichen: `http://localhost:8000/export`
+1. Repo public auf GitHub pushen, Pages: Branch `main`, Ordner `/docs`
+2. Fine-grained Token nur für dieses Repo, **Contents: Read and write**
+3. `.env` anlegen (gitignored): `GITHUB_TOKEN=…` und `GITHUB_REPO=<user>/was-ist-seife`
 
 **Achtung:** Die Seite ist öffentlich — inklusive Koordinaten und Notizen.
-
-## Tests
-
-```sh
-python test_app.py
-```
