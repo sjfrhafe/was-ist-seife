@@ -27,6 +27,8 @@ def test_crud():
 
     seite = client.get("/export").get_data(as_text=True)
     assert "Testcafé" in seite and "<marquee" in seite
+    assert 'href="disclaimer.html"' in seite
+    assert "Meinungs" in client.get("/disclaimer.html").get_data(as_text=True)
 
     antwort = client.post("/veroeffentlichen")
     assert antwort.status_code == 500

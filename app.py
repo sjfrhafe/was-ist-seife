@@ -182,10 +182,10 @@ def export_html():
                            stand=datetime.now().strftime("%d.%m.%Y %H:%M"))
 
 
-def github_veroeffentlichen(html):
+def github_veroeffentlichen(pfad, html):
     if not GITHUB_TOKEN or not GITHUB_REPO:
         raise RuntimeError("GITHUB_TOKEN und GITHUB_REPO müssen gesetzt sein (siehe README)")
-    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{EXPORT_PFAD}"
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{pfad}"
     kopf = {
         "Authorization": f"Bearer {GITHUB_TOKEN}",
         "Accept": "application/vnd.github+json",
@@ -195,12 +195,15 @@ def github_veroeffentlichen(html):
     try:
         anfrage = urllib.request.Request(f"{url}?ref={GITHUB_BRANCH}", headers=kopf)
         with urllib.request.urlopen(anfrage) as antwort:
-            sha = json.load(antwort)["sha"]
+            vorhanden = json.load(antwort)
+        if base64.b64decode(vorhanden["content"]) == html.encode():
+            return  # unverändert, kein Leer-Commit
+        sha = vorhanden["sha"]
     except urllib.error.HTTPError as fehler:
         if fehler.code != 404:  # 404 = Datei existiert noch nicht, erster Export
             raise
     daten = {
-        "message": "Export: Bewertungen aktualisiert",
+        "message": f"Export: {pfad} aktualisiert",
         "content": base64.b64encode(html.encode()).decode(),
         "branch": GITHUB_BRANCH,
     }
@@ -217,10 +220,17 @@ def export():
     return export_html()
 
 
+@app.get("/disclaimer.html")
+def disclaimer():
+    return render_template("disclaimer.html")
+
+
 @app.post("/veroeffentlichen")
 def veroeffentlichen():
+    disclaimer_pfad = f"{os.path.dirname(EXPORT_PFAD)}/disclaimer.html"
     try:
-        github_veroeffentlichen(export_html())
+        github_veroeffentlichen(EXPORT_PFAD, export_html())
+        github_veroeffentlichen(disclaimer_pfad, render_template("disclaimer.html"))
     except (RuntimeError, urllib.error.URLError) as fehler:
         return render_template("veroeffentlicht.html", fehler=str(fehler)), 500
     besitzer, repo = GITHUB_REPO.split("/", 1)
