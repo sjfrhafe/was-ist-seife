@@ -2,6 +2,8 @@ import os
 import tempfile
 
 os.environ["DB_PATH"] = os.path.join(tempfile.mkdtemp(), "test.db")
+os.environ.pop("GITHUB_TOKEN", None)  # nie gegen die echte API testen
+os.environ.pop("GITHUB_REPO", None)
 
 from app import app  # noqa: E402
 
@@ -21,6 +23,13 @@ def test_crud():
     assert "2026-07-31 12:30" in seite
 
     assert client.post("/neu", data={"name": ""}).status_code == 400
+
+    seite = client.get("/export").get_data(as_text=True)
+    assert "Testcafé" in seite and "<marquee" in seite
+
+    antwort = client.post("/veroeffentlichen")
+    assert antwort.status_code == 500
+    assert "GITHUB_TOKEN" in antwort.get_data(as_text=True)
 
     antwort = client.post("/1/bearbeiten", data={"name": "Testbar", "sterne": "2"},
                           follow_redirects=True)

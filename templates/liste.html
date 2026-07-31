@@ -17,4 +17,11 @@
 {% else %}
 <p>Noch keine Bewertungen. Leg mit „+ Neue Bewertung“ los.</p>
 {% endif %}
+<div style="margin-top:1.5rem; display:flex; gap:.6rem; align-items:center">
+  <form method="post" action="{{ url_for('veroeffentlichen') }}"
+        onsubmit="return confirm('Alle Bewertungen öffentlich auf github.io veröffentlichen?')">
+    <button type="submit">🌐 Veröffentlichen</button>
+  </form>
+  <a href="{{ url_for('export') }}" target="_blank">Vorschau der Export-Seite</a>
+</div>
 {% endblock %}

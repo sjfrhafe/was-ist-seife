@@ -1,10 +1,18 @@
+import base64
+import json
 import os
 import sqlite3
+import urllib.error
+import urllib.request
 from datetime import datetime
 
 from flask import Flask, g, redirect, render_template, request, url_for
 
 DB_PATH = os.environ.get("DB_PATH", "seife.db")
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
+GITHUB_REPO = os.environ.get("GITHUB_REPO", "")  # z. B. "fred/was-ist-seife"
+GITHUB_BRANCH = os.environ.get("GITHUB_BRANCH", "main")
+EXPORT_PFAD = os.environ.get("EXPORT_PFAD", "docs/index.html")
 
 TEXT_FELDER = [
     "name", "adresse", "wegbeschreibung", "erreichbarkeit",
@@ -150,6 +158,61 @@ def bearbeiten(eintrag_id):
         db().commit()
         return redirect(url_for("detail", eintrag_id=eintrag_id))
     return render_template("formular.html", eintrag=dict(eintrag))
+
+
+def export_html():
+    eintraege = db().execute(
+        "SELECT * FROM bewertungen "
+        "ORDER BY COALESCE(bewertungszeitpunkt, erstellt_am) DESC"
+    ).fetchall()
+    return render_template("export.html", eintraege=eintraege,
+                           stand=datetime.now().strftime("%d.%m.%Y %H:%M"))
+
+
+def github_veroeffentlichen(html):
+    if not GITHUB_TOKEN or not GITHUB_REPO:
+        raise RuntimeError("GITHUB_TOKEN und GITHUB_REPO müssen gesetzt sein (siehe README)")
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{EXPORT_PFAD}"
+    kopf = {
+        "Authorization": f"Bearer {GITHUB_TOKEN}",
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "was-ist-seife",
+    }
+    sha = None
+    try:
+        anfrage = urllib.request.Request(f"{url}?ref={GITHUB_BRANCH}", headers=kopf)
+        with urllib.request.urlopen(anfrage) as antwort:
+            sha = json.load(antwort)["sha"]
+    except urllib.error.HTTPError as fehler:
+        if fehler.code != 404:  # 404 = Datei existiert noch nicht, erster Export
+            raise
+    daten = {
+        "message": "Export: Bewertungen aktualisiert",
+        "content": base64.b64encode(html.encode()).decode(),
+        "branch": GITHUB_BRANCH,
+    }
+    if sha:
+        daten["sha"] = sha
+    anfrage = urllib.request.Request(url, data=json.dumps(daten).encode(),
+                                     headers=kopf, method="PUT")
+    with urllib.request.urlopen(anfrage):
+        pass
+
+
+@app.get("/export")
+def export():
+    return export_html()
+
+
+@app.post("/veroeffentlichen")
+def veroeffentlichen():
+    try:
+        github_veroeffentlichen(export_html())
+    except (RuntimeError, urllib.error.URLError) as fehler:
+        return render_template("veroeffentlicht.html", fehler=str(fehler)), 500
+    besitzer, repo = GITHUB_REPO.split("/", 1)
+    pages_url = f"https://{besitzer}.github.io/{repo}/"
+    return render_template("veroeffentlicht.html", fehler=None, pages_url=pages_url)
 
 
 @app.post("/<int:eintrag_id>/loeschen")

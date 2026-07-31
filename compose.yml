@@ -5,4 +5,7 @@ services:
       - "8000:8000"
     volumes:
       - ./data:/data
+    environment:
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+      GITHUB_REPO: ${GITHUB_REPO:-}
     restart: unless-stopped

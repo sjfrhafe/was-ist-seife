@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>~*~ Freds Toiletten-Testseite ~*~</title>
+<style>
+  .blink { animation: blinker 1s step-start infinite; }
+  @keyframes blinker { 50% { opacity: 0; } }
+</style>
+</head>
+<body bgcolor="#000080" text="#FFFF00" link="#00FFFF" vlink="#FF00FF">
+
+<center>
+<marquee behavior="alternate" scrollamount="8"><font face="Comic Sans MS, cursive" size="5" color="#00FF00">+++ Willkommen auf meiner Toiletten-Homepage!!! +++</font></marquee>
+
+<font face="Comic Sans MS, cursive" size="7" color="#FF00FF">~*~ Was ist Seife? ~*~</font><br>
+<font face="Times New Roman, serif" size="4">Freds gro&szlig;er Toiletten-Hygiene-Test</font><br>
+<font size="2" class="blink" color="#FF0000">!!! NEU !!! Jetzt mit {{ eintraege | length }} getesteten Toiletten !!! NEU !!!</font>
+
+<hr width="80%">
+
+{% if eintraege %}
+{% for e in eintraege %}
+<table width="600" border="3" cellpadding="6" cellspacing="0" bgcolor="#C0C0C0" bordercolor="#FF00FF">
+  <tr bgcolor="#008080">
+    <td colspan="2" align="center">
+      <font face="Comic Sans MS, cursive" size="5" color="#FFFF00">{{ e['name'] }}</font><br>
+      {% if e['sterne'] is not none %}
+      <font size="5" color="#FFD700">{{ '★' * e['sterne'] }}<font color="#404040">{{ '☆' * (5 - e['sterne']) }}</font></font>
+      <font color="#FFFFFF">({{ e['sterne'] }} von 5 Sternen)</font>
+      {% endif %}
+    </td>
+  </tr>
+  <tr><td colspan="2" align="center" bgcolor="#000000"><font color="#00FF00" size="2">
+    ± getestet am {{ (e['bewertungszeitpunkt'] or e['erstellt_am']) | replace('T', ' um ') }} Uhr ±
+  </font></td></tr>
+  {% macro zeile(titel, wert) %}
+  {% if wert %}<tr><td width="220"><font face="Times New Roman, serif" color="#000080"><b>{{ titel }}</b></font></td>
+  <td><font face="Times New Roman, serif" color="#000000">{{ wert }}</font></td></tr>{% endif %}
+  {% endmacro %}
+  {{ zeile('Adresse', e['adresse']) }}
+  {% if e['lat'] is not none and e['lng'] is not none %}
+  <tr><td><font color="#000080"><b>Wo isses?</b></font></td>
+  <td><a href="https://www.openstreetmap.org/?mlat={{ e['lat'] }}&mlon={{ e['lng'] }}#map=18/{{ e['lat'] }}/{{ e['lng'] }}"><font color="#0000EE"><u>Hier klicken f&uuml;r die Karte!</u></font></a></td></tr>
+  {% endif %}
+  {{ zeile('Wegbeschreibung', e['wegbeschreibung']) }}
+  {{ zeile('Beschilderung sichtbar', 'Ja' if e['beschilderung_sichtbar'] else 'Nein') }}
+  {{ zeile('Gender-Kennzeichnung verständlich', 'Ja' if e['gender_verstaendlich'] else 'Nein') }}
+  {{ zeile('Erreichbarkeit', e['erreichbarkeit']) }}
+  {{ zeile('Schwere Tür', 'Ja, uff!' if e['schwere_tuer'] else 'Nein') }}
+  {{ zeile('Sauberkeit', (e['sauberkeit'] ~ ' von 5') if e['sauberkeit'] is not none else '') }}
+  {{ zeile('Klopapier aerosolgeschützt', 'Ja' if e['papier_geschuetzt'] else 'Nein') }}
+  {{ zeile('Spülmechanismus', e['spuelmechanismus']) }}
+  {{ zeile('Seife', e['seife'] ~ (' — ' ~ e['seife_kommentar'] if e['seife_kommentar'] else '') if e['seife'] else '') }}
+  {{ zeile('Wasserhahn', e['wasserhahn'] ~ (' — ' ~ e['wasserhahn_kommentar'] if e['wasserhahn_kommentar'] else '') if e['wasserhahn'] else '') }}
+  {{ zeile('Handtrocknung', e['handtrocknung'] ~ (' — ' ~ e['handtrocknung_kommentar'] if e['handtrocknung_kommentar'] else '') if e['handtrocknung'] else '') }}
+  {{ zeile('Mülleimer', e['muelleimer']) }}
+  {{ zeile('Ausgang', e['ausgang'] ~ (' (ohne Klinke öffenbar: ' ~ ('Ja' if e['ausgang_kontaktlos'] else 'Nein') ~ ')' if e['ausgang'] == 'Tür' else '') if e['ausgang'] else '') }}
+  {{ zeile('Notizen', e['notizen']) }}
+</table>
+<font size="4" color="#00FFFF">.oO°Oo.·´¯`·.oO°Oo.·´¯`·.oO°Oo.</font><br><br>
+{% endfor %}
+{% else %}
+<font face="Comic Sans MS, cursive" size="4">Hier entsteht in K&uuml;rze eine gro&szlig;e Toiletten-Testseite. Schau bald wieder vorbei!</font><br>
+<font size="6">&#128679; UNDER CONSTRUCTION &#128679;</font>
+{% endif %}
+
+<hr width="80%">
+
+<font face="Times New Roman, serif" size="2">
+Zuletzt aktualisiert: {{ stand }} &nbsp;|&nbsp; Du bist Besucher Nr. <b>0000042</b><br>
+Diese Seite ist Teil des Toiletten-Webrings: [ <a href="#"><u>zur&uuml;ck</u></a> | <a href="#"><u>Zufall</u></a> | <a href="#"><u>weiter</u></a> ]<br>
+Am besten anzusehen in 800&times;600 mit Netscape Navigator 4.7 &nbsp;|&nbsp; Diese Seite ist Y2K-gepr&uuml;ft!<br>
+<span class="blink">&copy; {{ stand[6:10] }} Fred &mdash; Alle Rechte vorbehalten!!</span>
+</font>
+</center>
+
+</body>
+</html>

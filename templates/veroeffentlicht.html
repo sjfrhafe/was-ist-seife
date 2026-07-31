@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block inhalt %}
+{% if fehler %}
+<p class="fehler">Veröffentlichen fehlgeschlagen: {{ fehler }}</p>
+{% else %}
+<p>✅ Veröffentlicht! Der Commit liegt auf GitHub, die Seite erscheint gleich unter
+<a href="{{ pages_url }}">{{ pages_url }}</a> (GitHub Pages braucht ein bis zwei Minuten).</p>
+{% endif %}
+<p><a class="knopf" href="{{ url_for('liste') }}">Zurück zur Liste</a></p>
+{% endblock %}
